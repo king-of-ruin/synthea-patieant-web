@@ -20,7 +20,7 @@
 
 ```
 java -version
-python --version
+python --version (若python不行 改成py重試)
 git --version
 ```
 
@@ -85,7 +85,7 @@ cd synthea
 回到專案資料夾，並確認虛擬環境已啟動（終端機最前面有 `(venv)`）：
 
 ```
-python import_data.py
+python import_data.py (若python不行 改成py重試)
 ```
 
 會建立 `health.db`，並印出各表的 CSV 筆數與資料庫筆數，以及孤兒資料檢查結果。
@@ -93,7 +93,7 @@ python import_data.py
 ### 6. 啟動網頁
 
 ```
-python app.py
+python app.py (若python不行 改成py重試)
 ```
 
 瀏覽器開啟 http://127.0.0.1:5000 。按 Ctrl+C 可停止伺服器。
@@ -111,14 +111,14 @@ docker run -d --name hapi -p 8080:8080 hapiproject/hapi:latest
 2. 用編輯器開啟 `load_fhir.py`，把 `FHIR_DIR` 改成你自己的 `synthea/output/fhir` 路徑，然後載入資料（只能執行一次，約需 10 到 30 分鐘）：
 
 ```
-python load_fhir.py
+python load_fhir.py (若python不行 改成py重試)
 ```
 
 3. 列出病人數最多的診斷，挑一個代碼後比較：
 
 ```
-python compare_fhir_sql.py
-python compare_fhir_sql.py 診斷代碼
+python compare_fhir_sql.py          (若python不行 改成py重試)
+python compare_fhir_sql.py 診斷代碼  (若python不行 改成py重試)
 ```
 
 程式會比較「病人總數」、「有此診斷的病人數」、「此診斷的紀錄筆數」，並標示 SQL 與 FHIR 是否一致。
@@ -138,7 +138,7 @@ python compare_fhir_sql.py 診斷代碼
 
 部署在 Render（免費 Web Service），設定如下：
 
-- Build Command：`pip install -r requirements.txt && python import_data.py`
+- Build Command：`pip install -r requirements.txt && python import_data.py` 
 - Start Command：`gunicorn app:app`
 - 環境變數：`PYTHON_VERSION` 設為與本機相同的 Python 版本
 
