@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>年齡層統計</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    body { font-family: "Microsoft JhengHei", sans-serif; margin: 30px auto; max-width: 900px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #2f5f98; color: white; }
+    a { color: #2f5f98; text-decoration: none; }
+    .note { color: #666; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <p><a href="/">← 回病人清單</a></p>
+  <h1>各年齡層人數</h1>
+  <p class="note">合成資料共 {{ total }} 位病人，年齡以 {{ ref_date }} 計算。</p>
+
+  <canvas id="ageChart" height="120"></canvas>
+
+  <table>
+    <tr><th>年齡區間</th><th>男</th><th>女</th><th>合計</th></tr>
+    {% for i in range(labels|length) %}
+    <tr>
+      <td>{{ labels[i] }} 歲</td>
+      <td>{{ male[i] }}</td>
+      <td>{{ female[i] }}</td>
+      <td>{{ male[i] + female[i] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <script>
+    new Chart(document.getElementById('ageChart'), {
+      type: 'bar',
+      data: {
+        labels: {{ labels|tojson }},
+        datasets: [
+          { label: '男', data: {{ male|tojson }}, backgroundColor: '#2f5f98' },
+          { label: '女', data: {{ female|tojson }}, backgroundColor: '#e07b91' }
+        ]
+      },
+      options: {
+        scales: {
+          x: { stacked: true, title: { display: true, text: '年齡區間（歲）' } },
+          y: { stacked: true, beginAtZero: true, title: { display: true, text: '人數' },
+               ticks: { precision: 0 } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

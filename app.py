@@ -160,5 +160,30 @@ def patient_detail(patient_id):
                             meds=meds,labs=lab_rows,labs_total=labs_total,)
 
 
+@app.route("/stats")
+def stats():
+    conn = get_db()
+    rows = conn.execute("SELECT birthdate, gender FROM patients").fetchall()
+    conn.close()
+
+    counts = {g: {"M": 0, "F": 0} for g in AGE_GROUPS}
+    for r in rows:
+        age = calc_age(r["birthdate"])
+        for g, (low, high) in AGE_GROUPS.items():
+            if low <= age <= high:
+                if r["gender"] in ("M", "F"):
+                    counts[g][r["gender"]] += 1
+                break
+
+    labels = list(AGE_GROUPS.keys())
+    return render_template(
+        "stats.html",
+        labels=labels,
+        male=[counts[g]["M"] for g in labels],
+        female=[counts[g]["F"] for g in labels],
+        total=len(rows),
+        ref_date=REF_DATE.isoformat(),
+    )
+
 if __name__ == "__main__":
     app.run(debug=True)
