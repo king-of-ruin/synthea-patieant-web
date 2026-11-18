@@ -50,7 +50,7 @@ cd synthea-patient-web
 ### 2. 建立 Python 虛擬環境並安裝套件
 
 ```
-python -m venv venv
+python -m venv venv             (若python不行 改成py重試)
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
