@@ -44,7 +44,7 @@ synthea-patieant-web/
 
 ```
 git clone https://github.com/king-of-ruin/synthea-patieant-web.git
-cd synthea-patient-web
+cd synthea-patieant-web
 ```
 
 ### 2. 建立 Python 虛擬環境並安裝套件
