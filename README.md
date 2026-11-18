@@ -16,7 +16,7 @@
 
 - Docker Desktop（只有做 FHIR 比對才需要）
 
-確認版本：
+確認版本(PowerShell)：
 
 ```
 java -version
@@ -58,7 +58,7 @@ pip install -r requirements.txt
 （Mac/Linux：`source venv/bin/activate`。若 PowerShell 擋住指令碼，先執行
 `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`。）
 
-### 3. 用 Synthea 產生資料
+### 3. 用 Synthea 產生資料 
 
 在專案 資料夾外面 下載並執行 Synthea：
 
@@ -89,7 +89,7 @@ cd..
 python import_data.py (若python不行 改成py重試)
 ```
 
-會建立 `health.db`，並印出各表的 CSV 筆數與資料庫筆數，以及遺漏直資料檢查結果。
+會建立 `health.db`，並印出各表的 CSV 筆數與資料庫筆數，以及遺漏值資料檢查結果。
 
 ### 6. 啟動網頁
 
