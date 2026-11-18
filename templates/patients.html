@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>病人清單</title>
+  <style>
+    body { font-family: "Microsoft JhengHei", sans-serif; margin: 30px auto; max-width: 900px; }
+    form { margin-bottom: 20px; padding: 12px; background: #f3f6fa; border-radius: 6px; }
+    select, button { padding: 5px 8px; margin-right: 10px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #2f5f98; color: white; }
+    tr:hover { background: #eef3fa; }
+    a { color: #2f5f98; text-decoration: none; }
+    .note { color: #666; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>病人清單（合成資料）</h1>
+  <p class="note">資料來源：Synthea 合成病人，非真人。年齡以 {{ ref_date }} 計算。</p>
+
+  <form method="get" action="/">
+    性別：
+    <select name="gender">
+      <option value="">全部</option>
+      <option value="M" {% if gender == 'M' %}selected{% endif %}>男</option>
+      <option value="F" {% if gender == 'F' %}selected{% endif %}>女</option>
+    </select>
+
+    年齡區間：
+    <select name="age_group">
+      <option value="">全部</option>
+      {% for g in age_groups %}
+      <option value="{{ g }}" {% if age_group == g %}selected{% endif %}>{{ g }} 歲</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">篩選</button>
+    <a href="/">清除條件</a>
+  </form>
+
+  <p>共 {{ patients|length }} 位病人</p>
+
+  <table>
+    <tr>
+      <th>姓名</th><th>性別</th><th>生日</th><th>年齡</th><th>狀態</th>
+    </tr>
+    {% for p in patients %}
+    <tr>
+      <td><a href="/patient/{{ p.id }}">{{ p.name }}</a></td>
+      <td>{{ '男' if p.gender == 'M' else '女' }}</td>
+      <td>{{ p.birthdate }}</td>
+      <td>{{ p.age }}</td>
+      <td>{{ '已歿' if p.deceased else '存活' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

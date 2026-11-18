@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ p.name }} - 病人詳細</title>
+  <style>
+    body { font-family: "Microsoft JhengHei", sans-serif; margin: 30px auto; max-width: 900px; }
+    .info { background: #f3f6fa; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #2f5f98; color: white; }
+    a { color: #2f5f98; text-decoration: none; }
+    .none { color: #999; }
+  </style>
+</head>
+<body>
+  <p><a href="/">← 回病人清單</a></p>
+  <h1>{{ p.name }}</h1>
+
+  <div class="info">
+    性別：{{ '男' if p.gender == 'M' else '女' }}　
+    生日：{{ p.birthdate }}　
+    年齡：{{ p.age }}　
+    城市：{{ p.city }}, {{ p.state }}
+    {% if p.deathdate %}　死亡日期：{{ p.deathdate }}{% endif %}
+  </div>
+
+  <h2>就診紀錄（共 {{ visits|length }} 筆，依日期由早到晚）</h2>
+  <table>
+    <tr><th>日期</th><th>就診類型</th><th>就診說明</th><th>診斷</th></tr>
+    {% for v in visits %}
+    <tr>
+      <td>{{ v.date }}</td>
+      <td>{{ v.type }}</td>
+      <td>{{ v.description }}</td>
+      <td>
+        {% if v.diagnoses %}
+          {% for d in v.diagnoses %}{{ d }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+        {% else %}
+          <span class="none">—</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
