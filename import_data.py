@@ -11,6 +11,10 @@ DROP TABLE IF EXISTS conditions;
 DROP TABLE IF EXISTS encounters;
 DROP TABLE IF EXISTS patients;
 
+
+DROP TABLE IF EXISTS observations;
+DROP TABLE IF EXISTS medications;
+
 CREATE TABLE patients (
     id TEXT PRIMARY KEY,
     birthdate TEXT,
@@ -47,6 +51,40 @@ CREATE TABLE conditions (
     FOREIGN KEY (patient) REFERENCES patients(id),
     FOREIGN KEY (encounter) REFERENCES encounters(id)
 );
+
+
+CREATE TABLE medications (
+    row_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient TEXT NOT NULL,
+    encounter TEXT,
+    start TEXT,
+    stop TEXT,
+    code TEXT,
+    description TEXT,
+    reasondescription TEXT,
+    FOREIGN KEY (patient) REFERENCES patients(id),
+    FOREIGN KEY (encounter) REFERENCES encounters(id)
+);
+
+CREATE TABLE observations (
+    row_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    patient TEXT NOT NULL,
+    encounter TEXT,
+    date TEXT,
+    category TEXT,
+    code TEXT,
+    description TEXT,
+    value TEXT,
+    units TEXT,
+    type TEXT,
+    FOREIGN KEY (patient) REFERENCES patients(id),
+    FOREIGN KEY (encounter) REFERENCES encounters(id)
+);
+
+CREATE INDEX idx_enc_patient ON encounters(patient);
+CREATE INDEX idx_cond_patient ON conditions(patient);
+CREATE INDEX idx_med_patient ON medications(patient);
+CREATE INDEX idx_obs_patient ON observations(patient);
 """
 
 
@@ -76,6 +114,17 @@ def main():
         ["patient", "encounter", "start", "stop", "code", "description"],
     )
 
+    
+    medications = load(
+        "medications",
+        ["patient", "encounter", "start", "stop", "code", "description", "reasondescription"],
+    )
+    observations = load(
+        "observations",
+        ["patient", "encounter", "date", "category", "code", "description", "value", "units", "type"],
+    )
+
+
     conn = sqlite3.connect(DB)
     conn.executescript(SCHEMA)
     conn.execute("PRAGMA foreign_keys = ON")
@@ -83,12 +132,16 @@ def main():
     patients.to_sql("patients", conn, if_exists="append", index=False)
     encounters.to_sql("encounters", conn, if_exists="append", index=False)
     conditions.to_sql("conditions", conn, if_exists="append", index=False)
+
+    
+    medications.to_sql("medications", conn, if_exists="append", index=False)
+    observations.to_sql("observations", conn, if_exists="append", index=False, chunksize=5000)
     conn.commit()
 
     # ===== 資料核對（報告第 2 題要用）=====
     print("=== 資料核對 ===")
     for name, df in [("patients", patients), ("encounters", encounters),
-                     ("conditions", conditions)]:
+                     ("conditions", conditions), ("medications", medications), ("observations", observations)]:
         n_db = conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
         print(f"{name}: CSV 筆數 = {len(df)}, 資料庫筆數 = {n_db}")
 
@@ -101,6 +154,13 @@ def main():
     ).fetchone()[0]
     print(f"找不到病人的就診筆數: {orphan_enc}")
     print(f"找不到就診的診斷筆數: {orphan_cond}")
+
+    for name in ["medications", "observations"]:
+        n = conn.execute(
+            f"SELECT COUNT(*) FROM {name} WHERE encounter IS NOT NULL "
+            f"AND encounter NOT IN (SELECT id FROM encounters)"
+        ).fetchone()[0]
+        print(f"{name} 找不到就診的筆數: {n}")
 
     conn.close()
     print("完成！資料庫檔案：", DB)

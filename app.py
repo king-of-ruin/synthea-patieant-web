@@ -95,6 +95,27 @@ def patient_detail(patient_id):
         "SELECT encounter, description FROM conditions WHERE patient = ?",
         (patient_id,),
     ).fetchall()
+
+    
+    # B3：用藥紀錄（依開始日期由早到晚）
+    medications = conn.execute(
+        "SELECT start, stop, description, reasondescription "
+        "FROM medications WHERE patient = ? ORDER BY start",
+        (patient_id,),
+    ).fetchall()
+
+    # B3：檢驗值（只取 laboratory 類別，最近 50 筆）
+    labs_total = conn.execute(
+        "SELECT COUNT(*) FROM observations "
+        "WHERE patient = ? AND category = 'laboratory'",
+        (patient_id,),
+    ).fetchone()[0]
+    labs = conn.execute(
+        "SELECT date, description, value, units FROM observations "
+        "WHERE patient = ? AND category = 'laboratory' "
+        "ORDER BY date DESC LIMIT 50",
+        (patient_id,),
+    ).fetchall()
     conn.close()
 
     conditions_by_enc = {}
@@ -110,6 +131,22 @@ def patient_detail(patient_id):
             "diagnoses": conditions_by_enc.get(e["id"], []),
         })
 
+
+        meds = [{
+        "start": (m["start"] or "")[:10],
+        "stop": (m["stop"] or "")[:10],
+        "description": m["description"],
+        "reason": m["reasondescription"],
+    } for m in medications]
+
+    lab_rows = [{
+        "date": (o["date"] or "")[:10],
+        "description": o["description"],
+        "value": o["value"],
+        "units": o["units"],
+    } for o in labs]
+
+
     info = {
         "name": f'{patient["first_name"]} {patient["last_name"]}',
         "gender": patient["gender"],
@@ -119,7 +156,8 @@ def patient_detail(patient_id):
         "city": patient["city"],
         "state": patient["state"],
     }
-    return render_template("patient_detail.html", p=info, visits=visits)
+    return render_template("patient_detail.html", p=info, visits=visits,
+                            meds=meds,labs=lab_rows,labs_total=labs_total,)
 
 
 if __name__ == "__main__":

@@ -42,6 +42,40 @@
       </td>
     </tr>
     {% endfor %}
+
   </table>
+  <h2>用藥紀錄（共 {{ meds|length }} 筆）</h2>
+  {% if meds %}
+  <table>
+    <tr><th>開始日期</th><th>結束日期</th><th>藥品</th><th>用藥原因</th></tr>
+    {% for m in meds %}
+    <tr>
+      <td>{{ m.start }}</td>
+      <td>{{ m.stop or '使用中' }}</td>
+      <td>{{ m.description }}</td>
+      <td>{{ m.reason or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="none">沒有用藥紀錄</p>
+  {% endif %}
+
+  <h2>檢驗值（共 {{ labs_total }} 筆，顯示最近 {{ labs|length }} 筆）</h2>
+  {% if labs %}
+  <table>
+    <tr><th>日期</th><th>檢驗項目</th><th>數值</th><th>單位</th></tr>
+    {% for o in labs %}
+    <tr>
+      <td>{{ o.date }}</td>
+      <td>{{ o.description }}</td>
+      <td>{{ o.value }}</td>
+      <td>{{ o.units or '' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="none">沒有檢驗紀錄</p>
+  {% endif %}
 </body>
 </html>
